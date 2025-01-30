@@ -1,0 +1,48 @@
+jobs:
+  stage_0_job_0:
+    name: point-cloud-transport point-cloud-interfaces
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs: []
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Build ros-humble-point-cloud-transport ros-humble-point-cloud-interfaces
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-humble-point-cloud-transport ros-humble-point-cloud-interfaces
+        DOCKER_IMAGE: condaforge/linux-anvil-cos7-x86_64
+      run: |
+        export CI=azure
+        export GIT_BRANCH=$BUILD_SOURCEBRANCHNAME
+        export FEEDSTOCK_NAME=$(basename ${BUILD_REPOSITORY_NAME})
+        .scripts/build_linux.sh
+  stage_1_job_1:
+    name: zstd-point-cloud-transport zlib-point-cloud-transport draco-point-cloud-transport
+      point-cloud-transport-plugins
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Build ros-humble-zstd-point-cloud-transport ros-humble-zlib-point-cloud-transport
+        ros-humble-draco-point-cloud-transport ros-humble-point-cloud-transport-plugins
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-humble-zstd-point-cloud-transport ros-humble-zlib-point-cloud-transport
+          ros-humble-draco-point-cloud-transport ros-humble-point-cloud-transport-plugins
+        DOCKER_IMAGE: condaforge/linux-anvil-cos7-x86_64
+      run: |
+        export CI=azure
+        export GIT_BRANCH=$BUILD_SOURCEBRANCHNAME
+        export FEEDSTOCK_NAME=$(basename ${BUILD_REPOSITORY_NAME})
+        .scripts/build_linux.sh
+name: build_linux
+on:
+  push:
+    branches:
+    - buildbranch_linux

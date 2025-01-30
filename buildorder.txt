@@ -1,0 +1,6 @@
+ros-humble-point-cloud-transport
+ros-humble-point-cloud-interfaces
+ros-humble-zstd-point-cloud-transport
+ros-humble-zlib-point-cloud-transport
+ros-humble-draco-point-cloud-transport
+ros-humble-point-cloud-transport-plugins
