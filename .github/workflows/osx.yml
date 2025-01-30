@@ -1,0 +1,45 @@
+jobs:
+  stage_0_job_0:
+    name: ffmpeg-image-transport-msgs ur-client-library ur-robot-driver ffmpeg-image-transport
+    runs-on: macos-13
+    strategy:
+      fail-fast: false
+    needs: []
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Build ros-humble-ffmpeg-image-transport-msgs ros-humble-ur-client-library
+        ros-humble-ur-robot-driver ros-humble-ffmpeg-image-transport
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-humble-ffmpeg-image-transport-msgs ros-humble-ur-client-library
+          ros-humble-ur-robot-driver ros-humble-ffmpeg-image-transport
+      run: |
+        export CI=azure
+        export GIT_BRANCH=$BUILD_SOURCEBRANCHNAME
+        export FEEDSTOCK_NAME=$(basename ${BUILD_REPOSITORY_NAME})
+        .scripts/build_osx.sh
+  stage_1_job_1:
+    name: ur-calibration ur
+    runs-on: macos-13
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Build ros-humble-ur-calibration ros-humble-ur
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-humble-ur-calibration ros-humble-ur
+      run: |
+        export CI=azure
+        export GIT_BRANCH=$BUILD_SOURCEBRANCHNAME
+        export FEEDSTOCK_NAME=$(basename ${BUILD_REPOSITORY_NAME})
+        .scripts/build_osx.sh
+name: build_osx
+on:
+  push:
+    branches:
+    - buildbranch_osx
